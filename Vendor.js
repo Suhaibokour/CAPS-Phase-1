@@ -1,26 +1,27 @@
 'use strict';
-const events = require('./events');
+const io = require('socket.io-client');
+const host = 'http://localhost:3001';
+const capsConnection = io.connect(host);
 const faker = require('faker');
 const customer = faker.name.findName();
 const address = faker.address.cityName();
 const store = '1-206-flowers';
 const orderID = faker.datatype.uuid();
-require('./actions')
-
 const data=setInterval(() => {
     let order ={
     customer:customer,
     address : address,
     store:store,
     orderID: orderID}
-   events.emit('pickup',order);
-}, 6000);
+   capsConnection.emit('pickup',order);
+}, 2000);
 
 
-events.on('delivered',(payload)=>{
-console.log(`DRIVER: delivered up ${payload.orderID}`);
+capsConnection.on('delivered',(payload)=>{
 console.log(`VENDOR: Thank you for delivering ${payload.orderID}`);
 })
 setTimeout(()=>{
 clearInterval(data)
-},6000)
+},30000)
+
+   
